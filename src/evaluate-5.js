@@ -31,6 +31,23 @@ export function evaluateFiveCards(cardCodes) {
     .map(([value]) => value)
     .sort((a, b) => b - a);
 
+  if (pairValues.length === 2) {
+    const highPairValue = pairValues[0];
+    const lowPairValue = pairValues[1];
+
+    const highPairCards = groups.get(highPairValue);
+    const lowPairCards = groups.get(lowPairValue);
+    const kicker = sortedCards.find(
+      (card) => card.value !== highPairValue && card.value !== lowPairValue
+    );
+
+    return {
+      category: 'Two pair',
+      chosen5: [...highPairCards, ...lowPairCards, kicker].map((card) => card.code),
+      tiebreak: [highPairValue, lowPairValue, kicker.value],
+    };
+  }
+
   if (pairValues.length === 1) {
     const pairValue = pairValues[0];
     const pairCards = groups.get(pairValue);
