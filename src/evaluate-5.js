@@ -72,6 +72,10 @@ function orderCardsBySpecificValues(cards, orderedValues) {
   return orderedCards;
 }
 
+function isFlush(cards) {
+  return cards.every((card) => card.suit === cards[0].suit);
+}
+
 export function evaluateFiveCards(cardCodes) {
   if (!Array.isArray(cardCodes) || cardCodes.length !== 5) {
     throw new Error('evaluateFiveCards expects exactly 5 cards');
@@ -94,6 +98,15 @@ export function evaluateFiveCards(cardCodes) {
     .sort((a, b) => b - a);
 
   const straightInfo = getStraightInfo(sortedCards);
+  const flush = isFlush(sortedCards);
+
+  if (flush) {
+    return {
+      category: 'Flush',
+      chosen5: sortedCards.map((card) => card.code),
+      tiebreak: sortedCards.map((card) => card.value),
+    };
+  }
 
   if (straightInfo) {
     const orderedStraightCards = orderCardsBySpecificValues(
