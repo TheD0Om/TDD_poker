@@ -17,6 +17,23 @@ function groupCardsByValue(cards) {
   return groups;
 }
 
+function isStraight(cards) {
+  const values = cards.map((card) => card.value);
+  const uniqueValues = [...new Set(values)].sort((a, b) => b - a);
+
+  if (uniqueValues.length !== 5) {
+    return false;
+  }
+
+  for (let i = 0; i < uniqueValues.length - 1; i += 1) {
+    if (uniqueValues[i] - uniqueValues[i + 1] !== 1) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export function evaluateFiveCards(cardCodes) {
   if (!Array.isArray(cardCodes) || cardCodes.length !== 5) {
     throw new Error('evaluateFiveCards expects exactly 5 cards');
@@ -37,6 +54,14 @@ export function evaluateFiveCards(cardCodes) {
     .filter(([, cards]) => cards.length === 2)
     .map(([value]) => value)
     .sort((a, b) => b - a);
+
+  if (isStraight(sortedCards)) {
+    return {
+      category: 'Straight',
+      chosen5: sortedCards.map((card) => card.code),
+      tiebreak: [sortedCards[0].value],
+    };
+  }
 
   if (threeOfAKindValues.length === 1) {
     const tripValue = threeOfAKindValues[0];
