@@ -105,6 +105,19 @@ export function evaluateFiveCards(cardCodes) {
   const straightInfo = getStraightInfo(sortedCards);
   const flush = isFlush(sortedCards);
 
+  if (straightInfo && flush) {
+    const orderedStraightFlushCards = orderCardsBySpecificValues(
+      sortedCards,
+      straightInfo.orderedValues
+    );
+
+    return {
+      category: 'Straight flush',
+      chosen5: orderedStraightFlushCards.map((card) => card.code),
+      tiebreak: [straightInfo.highCard],
+    };
+  }
+
   if (fourOfAKindValues.length === 1) {
     const quadValue = fourOfAKindValues[0];
     const quadCards = groups.get(quadValue);
