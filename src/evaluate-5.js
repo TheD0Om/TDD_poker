@@ -26,10 +26,29 @@ export function evaluateFiveCards(cardCodes) {
   const sortedCards = sortCardsByValueDesc(parsedCards);
   const groups = groupCardsByValue(sortedCards);
 
-  const pairValues = [...groups.entries()]
+  const entries = [...groups.entries()];
+
+  const threeOfAKindValues = entries
+    .filter(([, cards]) => cards.length === 3)
+    .map(([value]) => value)
+    .sort((a, b) => b - a);
+
+  const pairValues = entries
     .filter(([, cards]) => cards.length === 2)
     .map(([value]) => value)
     .sort((a, b) => b - a);
+
+  if (threeOfAKindValues.length === 1) {
+    const tripValue = threeOfAKindValues[0];
+    const tripCards = groups.get(tripValue);
+    const kickers = sortedCards.filter((card) => card.value !== tripValue);
+
+    return {
+      category: 'Three of a kind',
+      chosen5: [...tripCards, ...kickers].map((card) => card.code),
+      tiebreak: [tripValue, ...kickers.map((card) => card.value)],
+    };
+  }
 
   if (pairValues.length === 2) {
     const highPairValue = pairValues[0];
