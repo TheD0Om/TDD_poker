@@ -87,6 +87,11 @@ export function evaluateFiveCards(cardCodes) {
 
   const entries = [...groups.entries()];
 
+  const fourOfAKindValues = entries
+    .filter(([, cards]) => cards.length === 4)
+    .map(([value]) => value)
+    .sort((a, b) => b - a);
+
   const threeOfAKindValues = entries
     .filter(([, cards]) => cards.length === 3)
     .map(([value]) => value)
@@ -99,6 +104,31 @@ export function evaluateFiveCards(cardCodes) {
 
   const straightInfo = getStraightInfo(sortedCards);
   const flush = isFlush(sortedCards);
+
+  if (fourOfAKindValues.length === 1) {
+    const quadValue = fourOfAKindValues[0];
+    const quadCards = groups.get(quadValue);
+    const kicker = sortedCards.find((card) => card.value !== quadValue);
+
+    return {
+      category: 'Four of a kind',
+      chosen5: [...quadCards, kicker].map((card) => card.code),
+      tiebreak: [quadValue, kicker.value],
+    };
+  }
+
+  if (threeOfAKindValues.length === 1 && pairValues.length === 1) {
+    const tripValue = threeOfAKindValues[0];
+    const pairValue = pairValues[0];
+    const tripCards = groups.get(tripValue);
+    const pairCards = groups.get(pairValue);
+
+    return {
+      category: 'Full house',
+      chosen5: [...tripCards, ...pairCards].map((card) => card.code),
+      tiebreak: [tripValue, pairValue],
+    };
+  }
 
   if (flush) {
     return {
