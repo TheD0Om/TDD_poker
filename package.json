@@ -1,0 +1,25 @@
+{
+  "name": "tdd_poker",
+  "version": "1.0.0",
+  "description": "Texas Hold'em hand evaluator and comparer built with TDD",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheD0Om/TDD_poker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TheD0Om/TDD_poker/issues"
+  },
+  "homepage": "https://github.com/TheD0Om/TDD_poker#readme",
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}
