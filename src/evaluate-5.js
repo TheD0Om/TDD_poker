@@ -17,21 +17,59 @@ function groupCardsByValue(cards) {
   return groups;
 }
 
-function isStraight(cards) {
+function getStraightInfo(cards) {
   const values = cards.map((card) => card.value);
   const uniqueValues = [...new Set(values)].sort((a, b) => b - a);
 
   if (uniqueValues.length !== 5) {
-    return false;
+    return null;
   }
 
-  for (let i = 0; i < uniqueValues.length - 1; i += 1) {
-    if (uniqueValues[i] - uniqueValues[i + 1] !== 1) {
-      return false;
+  const isRegularStraight = uniqueValues.every((value, index) => {
+    if (index === uniqueValues.length - 1) {
+      return true;
     }
+    return value - uniqueValues[index + 1] === 1;
+  });
+
+  if (isRegularStraight) {
+    return {
+      highCard: uniqueValues[0],
+      orderedValues: uniqueValues,
+    };
   }
 
-  return true;
+  const isWheel =
+    uniqueValues[0] === 14 &&
+    uniqueValues[1] === 5 &&
+    uniqueValues[2] === 4 &&
+    uniqueValues[3] === 3 &&
+    uniqueValues[4] === 2;
+
+  if (isWheel) {
+    return {
+      highCard: 5,
+      orderedValues: [5, 4, 3, 2, 14],
+    };
+  }
+
+  return null;
+}
+
+function orderCardsBySpecificValues(cards, orderedValues) {
+  const usedIndexes = new Set();
+  const orderedCards = [];
+
+  for (const value of orderedValues) {
+    const cardIndex = cards.findIndex(
+      (card, index) => card.value === value && !usedIndexes.has(index)
+    );
+
+    usedIndexes.add(cardIndex);
+    orderedCards.push(cards[cardIndex]);
+  }
+
+  return orderedCards;
 }
 
 export function evaluateFiveCards(cardCodes) {
@@ -55,11 +93,18 @@ export function evaluateFiveCards(cardCodes) {
     .map(([value]) => value)
     .sort((a, b) => b - a);
 
-  if (isStraight(sortedCards)) {
+  const straightInfo = getStraightInfo(sortedCards);
+
+  if (straightInfo) {
+    const orderedStraightCards = orderCardsBySpecificValues(
+      sortedCards,
+      straightInfo.orderedValues
+    );
+
     return {
       category: 'Straight',
-      chosen5: sortedCards.map((card) => card.code),
-      tiebreak: [sortedCards[0].value],
+      chosen5: orderedStraightCards.map((card) => card.code),
+      tiebreak: [straightInfo.highCard],
     };
   }
 
